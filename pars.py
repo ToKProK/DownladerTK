@@ -4,7 +4,7 @@ from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import os
-
+from glob import glob
 
 my_list = []
 path_list = []
@@ -64,39 +64,39 @@ def parse_manga(link, path=None):
             my_list.clear()
             path_list.clear()
             for b in range(1, count_page + 1):
+                
                 image = driver.find_element(By.XPATH, "//div[@class='reader-view__wrap']/img")
                 img = image.get_attribute("src")
                 print("Link + " + img)
                 time.sleep(0.1)#если убрать эту паузу, то возникнет ошибка. Ссылка на решение проблемы - https://stackoverflow.com/questions/23557471/clicking-on-image-results-in-an-error-element-is-not-clickable-at-point-97-42
                 image.click()
                 time.sleep(0.2)
-
                 my_list.append(img)
-
+            
+            
+            driver.close()
+            driver.quit()
+            
+            
             headers = {
                 "Accept": "*/*",
                 "UserAgent":user_now
             }
-            i = 0
+            number_page = 0
+            Full_path_dir = create_directory(path=path, title_name=title_name)# Создаём директорию и получаем её путь
             for img_url in my_list:
                 req = requests.get(url=img_url, headers=headers)
                 response = req.content
-                i+=1
-                if path != None or path != "":
-                    Full_path_dir = os.path.join(path, title_name)
-                else:
-                    work_dir = os.getcwd()
-                    Full_path_dir = os.path.join(work_dir, title_name)
-                os.mkdir(Full_path_dir)
-                with open(f"{Full_path_dir}/{i}.png", "wb") as file:
+                number_page+=1
+                with open(f"{Full_path_dir}/{number_page}.png", "wb") as file: # Загружаем все изображения в созданный каталог
                     file.write(response)
-                    path_list.append(f"{Full_path_dir}/{i}.png")
-                    print(f"Download {i} page")
+                    path_list.append(f"{Full_path_dir}/{number_page}.png")
+                    print(f"Download {number_page} page")
             print(f"Глава №{count_chapters} успешно скачана")
             #Конвертируем картинки в pdf файл.
-            convert(title_name=title_name)
+            convert(title_name=title_name, path=Full_path_dir)
             #Удаляем все картинки
-            Del_directory()
+            Del_image(path=Full_path_dir)
         print("Все главы скачанны")
         return True
 
@@ -107,30 +107,39 @@ def parse_manga(link, path=None):
     #     driver.close()
     #     driver.quit()
 
+def create_directory(path, title_name):
+    if path != None or path != "": # Тут создаётся папка по выбранному пользователем пути, куда бует все складироваться
+        Full_path_dir = os.path.join(path, title_name)# Путь для создания папки, в выбранном каталоге
+    else: # Если пользователь не указал путь
+        work_dir = os.getcwd() # Узнаём  путь проекта
+        Full_path_dir = os.path.join(work_dir, title_name)# Путь для создания папки, в каталоге проекта
+    
+    if os.path.isdir(Full_path_dir) != True:
+        os.mkdir(Full_path_dir)# Создаём директорию в которй будем работать
+        print("Папка созданна")
+    else:
+        print("Папка уже была")
+    
+    return Full_path_dir
 
-def convert(title_name):
+def convert(title_name, path):
     global nomer_glavi
     print(path_list)
     #Проверяем файл на наличие запрещённых символов
     title_name = Check_file_name(title_name)
     # Создаём пдф файл главы
-    with open(f"data/pdf_files/{title_name}, {nomer_glavi}.pdf", "wb") as f:
+    with open(f"{path}/{title_name}, {nomer_glavi}.pdf", "wb") as f:
         f.write(img2pdf.convert(path_list))
     print(f"Конвертация {nomer_glavi} главы прошла успешно!")
     nomer_glavi = nomer_glavi + 1
 
-def Del_directory():
-    folder = "data/media/"
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-def Check_file_name(file_name):
+def Del_image(path): # Удаляем все скачанные картинки в папке, после конвертации их в пдф
+    pattern = '*.png'
+    pattern_path = os.path.join(path, pattern)
+    image_path = glob(pattern_path)
+    for file in image_path:
+        os.remove(file)
+def Check_file_name(file_name): # Замена символов, которые не могут быть в название файлов
     char_remov = ['*', '|', "\\", ':', '"', '<', '>', '?','/' ]
     for char in char_remov:
         file_name = file_name.replace(char, "#")
