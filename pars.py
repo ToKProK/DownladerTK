@@ -3,6 +3,7 @@ import time, requests, img2pdf, os, shutil
 from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+import os
 
 
 my_list = []
@@ -12,7 +13,7 @@ nomer_glavi = 1
 title_name = ""
 arthist = ""
 time_pause = 2
-def parse_manga(link):
+def parse_manga(link, path=None):
     # try:
         global nomer_glavi
         nomer_glavi = 1
@@ -23,14 +24,16 @@ def parse_manga(link):
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
         # options_Chr.add_argument("--headless=new")
-        # options_Chr.add_argument(f"user-agent={user_now}")
+        options_Chr.add_argument(f"user-agent={user_now}")
 
-        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
+        # options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         options_Fire.add_argument(f"user-agent={user_now}")
         #Получение драйвера и вставка юзер агента
-        
-        # driver = webdriver.Chrome(options=options_Chr)
-        driver = webdriver.Firefox(options=options_Fire)
+        try:
+            driver = webdriver.Chrome(options=options_Chr)#Попытка запустить драйвер chrome
+        except:
+            driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
+
         #Растягиваем окно во всю ширину.
         driver.maximize_window()
         #Переход по ссылке
@@ -76,13 +79,18 @@ def parse_manga(link):
             }
             i = 0
             for img_url in my_list:
-
                 req = requests.get(url=img_url, headers=headers)
                 response = req.content
                 i+=1
-                with open(f"data/media/{i}.png", "wb") as file:
+                if path != None or path != "":
+                    Full_path_dir = os.path.join(path, title_name)
+                else:
+                    work_dir = os.getcwd()
+                    Full_path_dir = os.path.join(work_dir, title_name)
+                os.mkdir(Full_path_dir)
+                with open(f"{Full_path_dir}/{i}.png", "wb") as file:
                     file.write(response)
-                    path_list.append(f"data/media/{i}.png")
+                    path_list.append(f"{Full_path_dir}/{i}.png")
                     print(f"Download {i} page")
             print(f"Глава №{count_chapters} успешно скачана")
             #Конвертируем картинки в pdf файл.

@@ -1,7 +1,7 @@
 from GUI import main_gui
+import flet
 def main():
-    link = "https://mangalib.me/nae-abeojiui-adeul-eul-chaj-aseo?section=info"
-    main_gui()
+    main_gui(flet.Page)
 
 if __name__=="__main__":
     main()
