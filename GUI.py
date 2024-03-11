@@ -1,15 +1,26 @@
 import flet as ft
+from pars import parse_manga
 
-def main(page: ft.Page):
+def main_gui(page: ft.Page):
     page.title = "DownloaderTK"
     page.theme_mode = "dark"#light
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-
+    page.window_min_height = 300
+    page.window_min_width = 700
     url_manga_page = ft.TextField(label="Введите url главной страницы", width=600)
-    but_start_manga = ft.OutlinedButton(text="Скачать", width=200)
+
+
+    def download_manga(e):
+        but_start_manga.disabled = True
+        url = url_manga_page.value
+        parse_manga(link=url)
+        page.update()
+    but_start_manga = ft.OutlinedButton(text="Скачать", width=200, on_click=download_manga)
 
     url_ranobe_page = ft.TextField(label="Введите url главной страницы", width=600)
     but_start_ranobe = ft.OutlinedButton(text="Скачать", width=200)
+
+
 
     manga_page = ft.Row(
         [
@@ -39,6 +50,7 @@ def main(page: ft.Page):
     )
 
 
+
     def switch_page(e):
         index = page.navigation_bar.selected_index
         page.clean()
@@ -56,4 +68,4 @@ def main(page: ft.Page):
         ], on_change=switch_page
     )
     page.add(manga_page)
-ft.app(target=main)
+ft.app(target=main_gui)
