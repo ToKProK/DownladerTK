@@ -1,11 +1,11 @@
 import flet as ft
 from pars import parse_manga
+from pars_ranob import parse_ranobe
 
 
 
 def main_gui(page: ft.Page):
     page.title = "DownloaderTK"
-    path_dir = None
     page.window_height = 500
     page.window_width = 900
     page.theme_mode = "dark"#light
@@ -13,27 +13,37 @@ def main_gui(page: ft.Page):
     page.window_min_height = 300
     page.window_min_width = 700
     
-
+    # Получаем путь в котом создадим папку
     def pick_directory(e: ft.FilePickerResultEvent):
         if not e.path:
-            dir_path.label = "None"
+            dir_path.label = "None" # Если пользователь ничего не выбрал
         else:
-            dir_path.label = e.path
+            dir_path.label = e.path # Если пользователь выбрал путь
         page.update()
 
     def download_manga(e):
-        but_start_manga.disabled = True
+        but_start_manga.disabled = True # Отключаем кнопку
         url = url_manga_page.value
         page.update()
         parse_manga(link=url, path=dir_path.label)
-        but_start_manga.disabled = False
+        but_start_manga.disabled = False # Включаем кнопку, когда все скачалось
         page.update()
+
+    def download_ranobe(e):
+        but_start_ranobe.disabled = True # Отключаем кнопку
+        url = url_ranobe_page.value
+        page.update()
+        parse_ranobe(link=url, path=dir_path.label)
+        but_start_ranobe.disabled = False # Включаем кнопку, когда все скачалось
+        page.update()
+
+
     but_start_manga = ft.OutlinedButton(text="Скачать", width=200, on_click=download_manga)# Кнопка скачать в разделе манги
     url_ranobe_page = ft.TextField(label="Введите url главной страницы", width=600)# Поле для ввода ссылки манги
-    but_start_ranobe = ft.OutlinedButton(text="Скачать", width=200)# Кнопка скачать в разделе ранобэ
+    but_start_ranobe = ft.OutlinedButton(text="Скачать", width=200, on_click=download_ranobe)# Кнопка скачать в разделе ранобэ
     url_manga_page = ft.TextField(label="Введите url главной страницы", width=600)# Поле для ввода ссылки манги
     directory_label = ft.Text(value="Выберите папку сохранения")# Текст в разделе настройки
-    dir_path = ft.TextField(label="", width=600, disabled=True)# Поле где будет указан выбранный путь
+    dir_path = ft.TextField(label="None", width=600, disabled=True)# Поле где будет указан выбранный путь
     
     but_dir = ft.OutlinedButton(text="Выбрать папку",icon=ft.icons.FOLDER_COPY_OUTLINED, width=200, on_click=lambda _: directory.get_directory_path())# Кнопка выбора папки
 

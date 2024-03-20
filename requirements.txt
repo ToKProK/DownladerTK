@@ -1,5 +1,6 @@
 fake_useragent==1.4.0
-flet==0.21.1
+flet==0.21.2
 img2pdf==0.5.1
+python_docx==1.1.0
 Requests==2.31.0
 selenium==4.18.1

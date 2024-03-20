@@ -1,9 +1,10 @@
 from selenium import webdriver
-import time, requests, img2pdf, os
+import time
 from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import os
+from docx import Document
 from glob import glob
 
 my_list = []
@@ -13,7 +14,7 @@ nomer_glavi = 1
 title_name = ""
 arthist = ""
 time_pause = 2
-def parse_manga(link, path=None):
+def parse_ranobe(link, path=None):
     # try:
         global nomer_glavi
         nomer_glavi = 1
@@ -43,63 +44,54 @@ def parse_manga(link, path=None):
         #Попытка получить название
         title_name = driver.find_element(By.CLASS_NAME, "media-name__main").text
 
+        
         #Нажимаю на кнопку начать читать
         driver.find_element(By.LINK_TEXT, "Начать читать").click()
-        time.sleep(time_pause)
+        time.sleep(1)
         #Кликаем по вкладке глав
         driver.find_element(By.XPATH, "//div[@data-reader-modal='chapters']").click()
         chapters = driver.find_elements(By.CLASS_NAME, "menu__item")
+        #Получаем количество глав
         count_chapters = (len(chapters))
         print(f"Количесвто глав = {count_chapters}")
         driver.find_element(By.CLASS_NAME, "popup_side").click()
 
 
-        #Главы
+        #Начало работы с документом
+        document = Document()
+        document.add_heading(f"{title_name}", 0)
         for i in range(0, count_chapters):
-            #Смотрим количество страниц
-            pages = driver.find_elements(By.XPATH, "//option")
-            count_page = (len(pages))
-            print(f"В данной главе {count_page} стр.")
-            #Очищаем списки
-            my_list.clear()
-            path_list.clear()
-            for b in range(1, count_page + 1):
-                
-                image = driver.find_element(By.XPATH, "//div[@class='reader-view__wrap']/img")
-                img = image.get_attribute("src")
-                print("Link + " + img)
-                time.sleep(0.1)#если убрать эту паузу, то возникнет ошибка. Ссылка на решение проблемы - https://stackoverflow.com/questions/23557471/clicking-on-image-results-in-an-error-element-is-not-clickable-at-point-97-42
-                image.click()
-                time.sleep(0.2)
-                my_list.append(img)
+            #Получаю название главы
+            driver.find_element(By.XPATH, "//div[@data-reader-modal='chapters']").click()
+            time.sleep(0.2)
+            name_chapter = driver.find_element(By.CLASS_NAME, "menu__item_active").text
+            driver.find_element(By.CLASS_NAME, "popup_side").click()
+            #Пишу в документ название главы
+            document.add_heading(f"{name_chapter}")
+            #Получаю весь текст главы
+            text_title = driver.find_element(By.CLASS_NAME, "reader-container").find_elements(By.XPATH, "//p")
             
-            
-            driver.close()
-            driver.quit()
-            
-            
-            headers = {
-                "Accept": "*/*",
-                "UserAgent":user_now
-            }
-            number_page = 0
-            Full_path_dir = create_directory(path=path, title_name=title_name)# Создаём директорию и получаем её путь
-            for img_url in my_list:
-                req = requests.get(url=img_url, headers=headers)
-                response = req.content
-                number_page+=1
-                with open(f"{Full_path_dir}/{number_page}.png", "wb") as file: # Загружаем все изображения в созданный каталог
-                    file.write(response)
-                    path_list.append(f"{Full_path_dir}/{number_page}.png")
-                    print(f"Download {number_page} page")
-            print(f"Глава №{count_chapters} успешно скачана")
-            #Конвертируем картинки в pdf файл.
-            convert(title_name=title_name, path=Full_path_dir)
-            #Удаляем все картинки
-            Del_image(path=Full_path_dir)
+            #Перебираю весь найденный текс и удаляю пустые строки (без понятия откуда они беруться ┐(￣ヘ￣;)┌ )
+            corect_text = list()
+            for a in text_title:
+                 if a.text != "":
+                      corect_text.append(a.text)
+            for paragraph in corect_text:
+                 document.add_paragraph(paragraph)
+            time.sleep(0.4)
+            try:
+                driver.find_element(By.LINK_TEXT, "Следующая глава").click()
+            except:
+                ""
+            text_title.clear()
+        title_name = Check_file_name(title_name)
+        create_directory(path=path, title_name=title_name)
+        if path != 'None':
+            document.save(f"{path}/{title_name}.docx")
+        else:
+            document.save(f"{title_name}.docx") 
         print("Все главы скачанны")
         return True
-
     # except Exception as ex:
     #     print(ex)
     #     return False
@@ -122,17 +114,6 @@ def create_directory(path, title_name):
     
     return Full_path_dir
 
-def convert(title_name, path):
-    global nomer_glavi
-    print(path_list)
-    #Проверяем файл на наличие запрещённых символов
-    title_name = Check_file_name(title_name)
-    # Создаём пдф файл главы
-    with open(f"{path}/{title_name}, {nomer_glavi}.pdf", "wb") as f:
-        f.write(img2pdf.convert(path_list))
-    print(f"Конвертация {nomer_glavi} главы прошла успешно!")
-    nomer_glavi = nomer_glavi + 1
-
 def Del_image(path): # Удаляем все скачанные картинки в папке, после конвертации их в пдф
     pattern = '*.png'
     pattern_path = os.path.join(path, pattern)# Шаблон по которому будут удалятся картинки
@@ -146,8 +127,8 @@ def Check_file_name(file_name): # Замена символов, которые 
     return file_name
 
 def main():
-    link = "https://mangalib.me/nae-abeojiui-adeul-eul-chaj-aseo?section=info"
-    parse_manga(link=link)
+    link = "https://ranobelib.me/about-the-reckless-girl-who-kept-challenging-a-reborn-man-like-me?section=info"
+    parse_ranobe(link=link)
 
 if __name__=="__main__":
     main()
