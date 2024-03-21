@@ -24,10 +24,10 @@ def parse_ranobe(link, path=None):
         options_Chr = webdriver.ChromeOptions()
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        # options_Chr.add_argument("--headless=new")
+        options_Chr.add_argument("--headless=new")
         options_Chr.add_argument(f"user-agent={user_now}")
 
-        # options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
+        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         options_Fire.add_argument(f"user-agent={user_now}")
         #Получение драйвера и вставка юзер агента
         try:
@@ -85,22 +85,19 @@ def parse_ranobe(link, path=None):
                 ""
             text_title.clear()
         title_name = Check_file_name(title_name)
-        create_directory(path=path, title_name=title_name)
-        if path != 'None':
-            document.save(f"{path}/{title_name}.docx")
-        else:
-            document.save(f"{title_name}.docx") 
+        Full_path_dir = create_directory(path=path, title_name=title_name)
+        document.save(f"{Full_path_dir}/{title_name}.docx")
         print("Все главы скачанны")
         return True
     # except Exception as ex:
     #     print(ex)
     #     return False
     # finally:
-    #     driver.close()
+    #     driver.close()https://ranobelib.me/about-the-reckless-girl-who-kept-challenging-a-reborn-man-like-me?section=info
     #     driver.quit()
 
 def create_directory(path, title_name):
-    if path != None or path != "": # Тут создаётся папка по выбранному пользователем пути, куда бует все складироваться
+    if path != None and path != "" and path != 'None': # Тут создаётся папка по выбранному пользователем пути, куда бует все складироваться
         Full_path_dir = os.path.join(path, title_name)# Путь для создания папки, в выбранном каталоге
     else: # Если пользователь не указал путь
         work_dir = os.getcwd() # Узнаём  путь проекта
