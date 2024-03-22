@@ -10,7 +10,7 @@ def main_gui(page: ft.Page):
     page.window_width = 900
     page.theme_mode = "dark"#light
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.window_min_height = 300
+    page.window_min_height = 400
     page.window_min_width = 700
     
     # Получаем путь в котом создадим папку
@@ -20,6 +20,12 @@ def main_gui(page: ft.Page):
         else:
             dir_path.label = e.path # Если пользователь выбрал путь
         page.update()
+
+
+    def open_mangalib(e):
+        page.launch_url('https://mangalib.me/')
+    def open_ranobelib(e):
+        page.launch_url('https://ranobelib.me/')
 
     def download_manga(e):
         but_start_manga.disabled = True # Отключаем кнопку
@@ -36,8 +42,8 @@ def main_gui(page: ft.Page):
         parse_ranobe(link=url, path=dir_path.label)
         but_start_ranobe.disabled = False # Включаем кнопку, когда все скачалось
         page.update()
-
-
+    img_ranobelib = ft.Container(width=100, height=100, image_src="icons/R_icon.png", on_click=open_ranobelib)
+    img_mangalib = ft.Container(width=100, height=100, image_src="icons/M_icon.png", on_click=open_mangalib)
     but_start_manga = ft.OutlinedButton(text="Скачать", width=200, on_click=download_manga)# Кнопка скачать в разделе манги
     url_ranobe_page = ft.TextField(label="Введите url главной страницы", width=600)# Поле для ввода ссылки манги
     but_start_ranobe = ft.OutlinedButton(text="Скачать", width=200, on_click=download_ranobe)# Кнопка скачать в разделе ранобэ
@@ -68,6 +74,7 @@ def main_gui(page: ft.Page):
             ft.Column(
                [
                     ft.Text("MangaLib"),
+                    img_mangalib,
                     url_manga_page,
                     but_start_manga
                     
@@ -82,6 +89,7 @@ def main_gui(page: ft.Page):
             ft.Column(
                 [
                     ft.Text("RanobeLib"),
+                    img_ranobelib,
                     url_ranobe_page,
                     but_start_ranobe
                 ], horizontal_alignment = ft.CrossAxisAlignment.CENTER
