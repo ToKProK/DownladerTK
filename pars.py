@@ -23,16 +23,21 @@ def parse_manga(link, path=None):
         options_Chr = webdriver.ChromeOptions()
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        options_Chr.add_argument("--headless=new")
+        #options_Chr.add_argument("--headless=new")
         options_Chr.add_argument(f"user-agent={user_now}")
+        options.add_argument("--disable-blink-features=AutomationControlled")
 
-        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
+        #options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         options_Fire.add_argument(f"user-agent={user_now}")
         #Получение драйвера и вставка юзер агента
         try:
             driver = webdriver.Chrome(options=options_Chr)#Попытка запустить драйвер chrome
         except:
-            driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
+            print("Не удалось запустить драйвер Chrome")
+            try:
+                driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
+            except:
+                print("Не удалось запустить дравйвер Firefox")
 
         #Растягиваем окно во всю ширину.
         driver.maximize_window()

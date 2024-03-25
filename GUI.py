@@ -6,13 +6,14 @@ from pars_ranob import parse_ranobe
 
 def main_gui(page: ft.Page):
     page.title = "DownloaderTK"
+    
     page.window_height = 500
     page.window_width = 900
     page.theme_mode = "dark"#light
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.window_min_height = 400
     page.window_min_width = 700
-    
+    page.window_center()
     # Получаем путь в котом создадим папку
     def pick_directory(e: ft.FilePickerResultEvent):
         if not e.path:
@@ -51,10 +52,15 @@ def main_gui(page: ft.Page):
     directory_label = ft.Text(value="Выберите папку сохранения")# Текст в разделе настройки
     dir_path = ft.TextField(label="None", width=600, disabled=True)# Поле где будет указан выбранный путь
     
-    but_dir = ft.OutlinedButton(text="Выбрать папку",icon=ft.icons.FOLDER_COPY_OUTLINED, width=200, on_click=lambda _: directory.get_directory_path())# Кнопка выбора папки
+    # Проводник
+    directory_path = ft.FilePicker(on_result=pick_directory)
+    page.overlay.append(directory_path)
 
-    directory = ft.FilePicker(on_result=pick_directory)# Проводник
-    page.overlay.append(directory)
+    but_dir = ft.OutlinedButton(text="Выбрать папку",icon=ft.icons.FOLDER_COPY_OUTLINED, width=200,
+                                 on_click=lambda _: directory_path.get_directory_path())# Кнопка выбора папки
+
+    
+    
 
 
     settings_page = ft.Row(
@@ -120,4 +126,10 @@ def main_gui(page: ft.Page):
         ], on_change=switch_page
     )
     page.add(manga_page)
-ft.app(target=main_gui)
+
+
+def main():
+    ft.app(target=main_gui)
+
+if __name__=="__main__":
+    main()
