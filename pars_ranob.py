@@ -1,6 +1,6 @@
 from selenium import webdriver
 import time
-from fake_useragent import UserAgent
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import os
@@ -19,21 +19,14 @@ def parse_ranobe(link, path=None):
         global nomer_glavi
         nomer_glavi = 1
         #Настройка юзер агента
-        user = UserAgent()
-        user_now = user.random
-        options_Chr = webdriver.ChromeOptions()
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        options_Chr.add_argument("--headless=new")
-        options_Chr.add_argument(f"user-agent={user_now}")
-
         options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
-        options_Fire.add_argument(f"user-agent={user_now}")
         #Получение драйвера и вставка юзер агента
         try:
-            driver = webdriver.Chrome(options=options_Chr)#Попытка запустить драйвер chrome
-        except:
             driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
+        except:
+            print("Драйвер не запускается")
 
         #Растягиваем окно во всю ширину.
         driver.maximize_window()

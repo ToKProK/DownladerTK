@@ -43,8 +43,8 @@ def main_gui(page: ft.Page):
         parse_ranobe(link=url, path=dir_path.label)
         but_start_ranobe.disabled = False # Включаем кнопку, когда все скачалось
         page.update()
-    img_ranobelib = ft.Container(width=100, height=100, image_src="icons/R_icon.png", on_click=open_ranobelib)
-    img_mangalib = ft.Container(width=100, height=100, image_src="icons/M_icon.png", on_click=open_mangalib)
+    img_ranobelib = ft.Container(width=100, height=100, image_src="R_icon.png", on_click=open_ranobelib)
+    img_mangalib = ft.Container(width=100, height=100, image_src="M_icon.png", on_click=open_mangalib)
     but_start_manga = ft.OutlinedButton(text="Скачать", width=200, on_click=download_manga)# Кнопка скачать в разделе манги
     url_ranobe_page = ft.TextField(label="Введите url главной страницы", width=600)# Поле для ввода ссылки манги
     but_start_ranobe = ft.OutlinedButton(text="Скачать", width=200, on_click=download_ranobe)# Кнопка скачать в разделе ранобэ

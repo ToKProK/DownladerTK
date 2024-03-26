@@ -6,6 +6,8 @@ from selenium.webdriver.common.keys import Keys
 import os
 from glob import glob
 
+
+
 my_list = []
 path_list = []
 count_chapters = 0
@@ -18,26 +20,14 @@ def parse_manga(link, path=None):
         global nomer_glavi
         nomer_glavi = 1
         #Настройка юзер агента
-        user = UserAgent()
-        user_now = user.random
-        options_Chr = webdriver.ChromeOptions()
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        #options_Chr.add_argument("--headless=new")
-        options_Chr.add_argument(f"user-agent={user_now}")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-
-        #options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
-        options_Fire.add_argument(f"user-agent={user_now}")
+        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         #Получение драйвера и вставка юзер агента
         try:
-            driver = webdriver.Chrome(options=options_Chr)#Попытка запустить драйвер chrome
+            driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
         except:
-            print("Не удалось запустить драйвер Chrome")
-            try:
-                driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
-            except:
-                print("Не удалось запустить дравйвер Firefox")
+            print("Не удалось запустить дравйвер Firefox")
 
         #Растягиваем окно во всю ширину.
         driver.maximize_window()
@@ -50,7 +40,7 @@ def parse_manga(link, path=None):
 
         #Нажимаю на кнопку начать читать
         driver.find_element(By.LINK_TEXT, "Начать читать").click()
-        time.sleep(time_pause)
+        time.sleep(0.2)
         #Кликаем по вкладке глав
         driver.find_element(By.XPATH, "//div[@data-reader-modal='chapters']").click()
         chapters = driver.find_elements(By.CLASS_NAME, "menu__item")
@@ -68,29 +58,29 @@ def parse_manga(link, path=None):
             #Очищаем списки
             my_list.clear()
             path_list.clear()
-            for b in range(1, count_page + 1):
-                
-                image = driver.find_element(By.XPATH, "//div[@class='reader-view__wrap']/img")
-                img = image.get_attribute("src")
-                print("Link + " + img)
-                time.sleep(0.1)#если убрать эту паузу, то возникнет ошибка. Ссылка на решение проблемы - https://stackoverflow.com/questions/23557471/clicking-on-image-results-in-an-error-element-is-not-clickable-at-point-97-42
-                image.click()
-                time.sleep(0.2)
-                my_list.append(img)
-            
+            for b in range(1, count_page + 1): # Цикл по перебору всех страниц в главе
+                for trying in range(3): # Цикл по попытке сбора информации (иногда из-за того, что страница не загрузилась выдаётся ошибка)
+                    try:
+                        time.sleep(0.2)
+                        image = driver.find_element(By.XPATH, "//div[@class='reader-view__wrap']/img")
+                        img = image.get_attribute("src")
+                        print("Link + " + img)
+                        time.sleep(0.1)#если убрать эту паузу, то возникнет ошибка. Ссылка на решение проблемы - https://stackoverflow.com/questions/23557471/clicking-on-image-results-in-an-error-element-is-not-clickable-at-point-97-42
+                        image.click()
+                        time.sleep(0.2)
+                        my_list.append(img)
+                        break
+                    except:
+                        print(f'{trying} попытка провалена')
             
             driver.close()
             driver.quit()
             
             
-            headers = {
-                "Accept": "*/*",
-                "UserAgent":user_now
-            }
             number_page = 0
             Full_path_dir = create_directory(path=path, title_name=title_name)# Создаём директорию и получаем её путь
             for img_url in my_list:
-                req = requests.get(url=img_url, headers=headers)
+                req = requests.get(url=img_url)
                 response = req.content
                 number_page+=1
                 with open(f"{Full_path_dir}/{number_page}.png", "wb") as file: # Загружаем все изображения в созданный каталог
@@ -151,7 +141,7 @@ def Check_file_name(file_name): # Замена символов, которые 
     return file_name
 
 def main():
-    link = "https://mangalib.me/nae-abeojiui-adeul-eul-chaj-aseo?section=info"
+    link = ""
     parse_manga(link=link)
 
 if __name__=="__main__":
