@@ -1,6 +1,5 @@
 from selenium import webdriver
 import time, requests, img2pdf, os
-from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import os
