@@ -14,13 +14,13 @@ title_name = ""
 arthist = ""
 time_pause = 2
 def parse_ranobe(link, path=None):
-    # try:
+    try:
         global nomer_glavi
         nomer_glavi = 1
         #Настройка юзер агента
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        #options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
+        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         #Получение драйвера и вставка юзер агента
         try:
             driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
@@ -82,12 +82,12 @@ def parse_ranobe(link, path=None):
         document.save(f"{Full_path_dir}/{title_name}.docx")
         print("Все главы скачанны")
         return True
-    # except Exception as ex:
-    #     print(ex)
-    #     return False
-    # finally:
-    #     driver.close()https://ranobelib.me/about-the-reckless-girl-who-kept-challenging-a-reborn-man-like-me?section=info
-    #     driver.quit()
+    except Exception as ex:
+        print(ex)
+        return False
+    finally:
+        driver.close()
+        driver.quit()
 
 def create_directory(path, title_name):
     if path != None and path != "" and path != 'None': # Тут создаётся папка по выбранному пользователем пути, куда бует все складироваться

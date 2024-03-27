@@ -15,7 +15,7 @@ title_name = ""
 arthist = ""
 time_pause = 2
 def parse_manga(link, path=None):
-    # try:
+    try:
         global nomer_glavi
         nomer_glavi = 1
         #Настройка юзер агента
@@ -94,12 +94,12 @@ def parse_manga(link, path=None):
         print("Все главы скачанны")
         return True
 
-    # except Exception as ex:
-    #     print(ex)
-    #     return False
-    # finally:
-    #     driver.close()
-    #     driver.quit()
+    except Exception as ex:
+        print(ex)
+        return False
+    finally:
+        driver.close()
+        driver.quit()
 
 def create_directory(path, title_name):
     if path != None and path != "" and path != 'None': # Тут создаётся папка по выбранному пользователем пути, куда бует все складироваться
