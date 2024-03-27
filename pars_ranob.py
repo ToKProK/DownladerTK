@@ -20,7 +20,7 @@ def parse_ranobe(link, path=None):
         #Настройка юзер агента
         options_Fire = webdriver.FirefoxOptions()
         #Делаем браузер невимым
-        options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
+        #options_Fire.add_argument("-headless")#https://ru.stackoverflow.com/questions/1330358/%D0%9D%D0%B5-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82-headless-firefox-selenium
         #Получение драйвера и вставка юзер агента
         try:
             driver = webdriver.Firefox(options=options_Fire)#Если не получилость пытаемся запустить драйвер firefox
@@ -54,6 +54,7 @@ def parse_ranobe(link, path=None):
         document.add_heading(f"{title_name}", 0)
         for i in range(0, count_chapters):
             #Получаю название главы
+            time.sleep(0.2)
             driver.find_element(By.XPATH, "//div[@data-reader-modal='chapters']").click()
             time.sleep(0.2)
             name_chapter = driver.find_element(By.CLASS_NAME, "menu__item_active").text
