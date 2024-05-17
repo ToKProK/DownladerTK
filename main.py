@@ -9,5 +9,5 @@ def main():
 if __name__=="__main__":
     main()
 
-#flet pack main.py --icon "icon.png" --add-data "assets:assets" - Упаковка приложения
+#flet pack main.py --icon "down.png" --add-data "assets:assets" - Упаковка приложения
 #https://flet.dev/docs/guides/python/packaging-desktop-app/
