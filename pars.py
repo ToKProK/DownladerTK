@@ -72,10 +72,6 @@ def parse_manga(link, path=None):
                     except:
                         print(f'{trying} попытка провалена')
             
-            driver.close()
-            driver.quit()
-            
-            
             number_page = 0
             Full_path_dir = create_directory(path=path, title_name=title_name)# Создаём директорию и получаем её путь
             for img_url in my_list:
